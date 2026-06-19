@@ -4,21 +4,17 @@ from tensorflow import keras
 from tensorflow.keras import layers
 import os
 
-# Reproducibilidade
 tf.random.set_seed(42)
 np.random.seed(42)
 
-# Carrega CIFAR-10
 (x_train, y_train), (x_test, y_test) = keras.datasets.cifar10.load_data()
 
-# Normaliza pixels para [0, 1]
 x_train = x_train.astype("float32") / 255.0
 x_test  = x_test.astype("float32") / 255.0
 
 y_train = keras.utils.to_categorical(y_train, 10)
 y_test  = keras.utils.to_categorical(y_test, 10)
 
-# Data augmentation simples
 datagen = keras.preprocessing.image.ImageDataGenerator(
     horizontal_flip=True,
     width_shift_range=0.1,
@@ -26,7 +22,6 @@ datagen = keras.preprocessing.image.ImageDataGenerator(
 )
 datagen.fit(x_train)
 
-# Arquitetura CNN simples
 model = keras.Sequential([
     # Bloco 1
     layers.Conv2D(32, (3, 3), padding="same", activation="relu", input_shape=(32, 32, 3)),
@@ -62,21 +57,18 @@ model = keras.Sequential([
 
 model.summary()
 
-# Compilação
 model.compile(
     optimizer=keras.optimizers.legacy.Adam(learning_rate=1e-3),
     loss="categorical_crossentropy",
     metrics=["accuracy"],
 )
 
-# Callbacks
 callbacks = [
     keras.callbacks.ReduceLROnPlateau(monitor="val_accuracy", factor=0.5, patience=5, verbose=1),
     keras.callbacks.EarlyStopping(monitor="val_accuracy", patience=15, restore_best_weights=True),
     keras.callbacks.ModelCheckpoint("model.keras", monitor="val_accuracy", save_best_only=True),
 ]
 
-# Treino
 history = model.fit(
     datagen.flow(x_train, y_train, batch_size=64),
     epochs=100,
@@ -84,11 +76,9 @@ history = model.fit(
     callbacks=callbacks,
 )
 
-# Avaliação final
 loss, acc = model.evaluate(x_test, y_test, verbose=0)
 print(f"\nAcurácia no conjunto de teste: {acc * 100:.2f}%")
 
-# Salva labels
 labels = ["aviao", "carro", "passaro", "gato", "cervo", "cachorro", "sapo", "cavalo", "navio", "caminhao"]
 np.save("labels.npy", labels)
 print("Modelo salvo em model.keras | Labels em labels.npy")
