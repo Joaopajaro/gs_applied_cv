@@ -1,0 +1,6 @@
+__pycache__/
+*.pyc
+.env
+model.keras
+labels.npy
+*.h5
