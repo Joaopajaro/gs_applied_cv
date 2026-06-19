@@ -2,3 +2,4 @@ __pycache__/
 *.pyc
 .env
 *.h5
+treino_log.txt
